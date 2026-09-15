@@ -1,0 +1,20 @@
+/* Gökçedere / Susurluk saha takvimi - genel arıcılık rehberi */
+(function(){
+const months={
+1:{title:'Ocak · Kış kontrolü',items:['Kovanı gereksiz açma; dışarıdan uçuş deliği ve kapak kontrolü yap.','Açlık riskini takip et; hafifleyen kolonileri önceliklendir.','Rüzgâr, yağmur ve nem girişini kontrol et.','Ölü arıların uçuş deliğini tıkamadığından emin ol.']},
+2:{title:'Şubat · İlk hareket',items:['Ilık ve sakin günlerde kısa kontrol planla.','Yem stokunu ve koloni canlılığını takip et.','Ana arı/yavru başlangıcını uygun havada gözle.','Varroa kayıtlarını gözden geçir; uygulama kararını kullanılan yönteme göre ver.']},
+3:{title:'Mart · İlkbahar gelişimi',items:['Yavru alanı, ana arı ve yem stokunu düzenli kaydet.','Zayıf kolonileri yakından takip et.','Su kaynağını hazır tut.','Hava uygun oldukça 7–10 günlük kontrol düzenine geç.']},
+4:{title:'Nisan · Hızlı gelişim',items:['Arılı ve yavrulu çerçeve artışını takip et.','Sıkışmayı önle; koloni gücüne göre alan ihtiyacını değerlendir.','Ana memesi ve oğul eğilimini her kontrolde kaydet.','Nektar akımı başladığında gereksiz beslemeyi yeniden değerlendir.']},
+5:{title:'Mayıs · Oğul ve bal dönemi',items:['Oğul eğilimini yakından izle; ana memelerini kaydet.','Güçlü kolonilerde alan ihtiyacını takip et.','Bal akımında koloniyi gereksiz yere uzun süre açık bırakma.','Hasat öncesi kovan bazında ballı çerçeve kaydı tut.']},
+6:{title:'Haziran · Bal akımı',items:['Ballı çerçeve ve koloni gücünü takip et.','Sıcak günlerde su ihtiyacına dikkat et.','Hasat tarihlerini ve kovan başı miktarı kaydet.','Yağmacılığı tetikleyecek açık şurup/bal bırakma.']},
+7:{title:'Temmuz · Sıcak ve kurak dönem',items:['Öğlen sıcağında uzun kontrol yapma; sabahı tercih et.','Su kaynağını sürekli erişilebilir tut.','Nektar kesilirse stok durumunu yakından izle.','Varroa sayımı ve tedavi kayıtlarını düzenli tut.']},
+8:{title:'Ağustos · Kışa hazırlığın başlangıcı',items:['Hasat sonrası bal/yem stokunu kovan bazında değerlendir.','Ana arı performansı ve yavru düzenini kontrol et.','Zayıf kolonileri erken tespit et.','Varroa durumunu kullanılan sayım yöntemine göre değerlendir.']},
+9:{title:'Eylül · Kışa hazırlık',items:['Bal/yem stokunu ve kovan ağırlığını takip et.','Ana arı ve yavru düzenini kontrol et; zayıf kolonileri işaretle.','Varroa kontrolünü geciktirme; sayım yöntemini kayda yaz.','Uçuş deliği, yağmacılık ve kovanın rüzgâr/yağmur durumunu kontrol et.','Soğuk geceler yaklaşırken gereksiz geniş alan bırakmamaya dikkat et.']},
+10:{title:'Ekim · Son düzenlemeler',items:['Ilık günlerde son kapsamlı kontrolleri tamamla.','Kışlık stok ve koloni gücünü karşılaştır.','Kovan içi nem ve havalandırmayı kontrol et.','Gereksiz kovan açılışlarını azalt.']},
+11:{title:'Kasım · Kış düzeni',items:['Kovanı yalnızca gerekli olduğunda aç.','Rüzgâr, yağmur, kapak ve uçuş deliği kontrolü yap.','Ağırlık takibiyle stok kaybını izle.','Arılık çevresindeki su birikmesi ve devrilme risklerini kontrol et.']},
+12:{title:'Aralık · Minimum müdahale',items:['Koloniyi rahatsız etmeden dış kontrol yap.','Kovan ağırlığını ve açlık riskini takip et.','Nem, kapak ve rüzgâr korumasını kontrol et.','Yeni sezon için ekipman ve kayıtları hazırla.']}
+};
+function renderCalendar(){const el=document.getElementById('seasonCalendar');if(!el)return;const now=new Date(),m=now.getMonth()+1,d=months[m],next=months[m===12?1:m+1];el.innerHTML=`<h2>📅 ${d.title}</h2><p class="muted">Gökçedere için mevsimsel saha planı · Hava ve koloni kayıtlarıyla birlikte değerlendirin.</p>${d.items.map(x=>`<div class="record"><div><b>✓ ${x}</b></div></div>`).join('')}<div class="alertbox" style="margin-top:12px"><b>Sonraki dönem: ${next.title}</b><div class="muted" style="margin-top:5px">${next.items[0]}</div></div>`}
+window.renderSeasonCalendar=renderCalendar;
+window.addEventListener('load',renderCalendar);
+})();
