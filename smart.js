@@ -1,48 +1,11 @@
 /* Kovan Defteri - koloni değerlendirme motoru */
 (function(){
-  function latestInspection(hiveId){
-    return (db.inspections||[]).filter(x=>x.hive===hiveId).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||null;
-  }
-  function colonyScore(hive){
-    const i=latestInspection(hive.id);
-    if(!i)return {score:null,label:'Kontrol gerekli',reasons:['Henüz kontrol kaydı yok']};
-    let s=50,reasons=[];
-    const bee=i.beeFrames===''||i.beeFrames==null?null:+i.beeFrames;
-    const brood=i.broodFrames===''||i.broodFrames==null?null:+i.broodFrames;
-    const honey=i.honeyFrames===''||i.honeyFrames==null?null:+i.honeyFrames;
-    const varroa=i.varroaCount===''||i.varroaCount==null?null:+i.varroaCount;
-    if(bee!=null){s+=Math.min(20,bee*2);if(bee<=4)reasons.push('Arılı çerçeve düşük');}
-    if(brood!=null){s+=Math.min(15,brood*2.5);if(brood<=2)reasons.push('Yavrulu çerçeve düşük');}
-    s+=({İyi:10,Orta:5,Zayıf:-5,Yok:-15}[i.brood]||0);
-    s+=({'Görüldü':5,'Yumurta görüldü':5,'Görülmedi':-5,'Şüpheli':-10}[i.queen]||0);
-    s+=({İyi:5,Orta:2,Az:-4,Yok:-10}[i.food]||0);
-    if(i.food==='Az'||i.food==='Yok')reasons.push('Yem/bal stoku '+i.food.toLowerCase());
-    if(i.queen==='Görülmedi'||i.queen==='Şüpheli')reasons.push('Ana arı kontrolü gerekli');
-    if(i.swarm&&i.swarm!=='Yok'){s-=8;reasons.push('Oğul eğilimi: '+i.swarm);}
-    if(varroa!=null&&varroa>0){s-=Math.min(15,varroa);reasons.push('Varroa sayımı: '+varroa);}
-    if(hive.status==='Zayıf')s-=10;
-    if(hive.status==='Ana arısız'){s-=25;reasons.push('Ana arısız');}
-    s=Math.max(0,Math.min(100,Math.round(s)));
-    return {score:s,label:s>=80?'Çok iyi':s>=65?'İyi':s>=45?'Orta':'Dikkat',reasons,bee,brood,honey,varroa};
-  }
-  window.latestInspection=latestInspection;
-  window.colonyScore=colonyScore;
-  window.kovanSmartAlerts=function(){
-    const out=[];
-    (db.hives||[]).filter(h=>h.status!=='Pasif').forEach(h=>{
-      const g=colonyScore(h);
-      if(g.score==null)out.push('⚠️ '+h.name+': kontrol kaydı gerekli');
-      else {
-        if(g.score<45)out.push('📉 '+h.name+': güç puanı '+g.score+'/100');
-        g.reasons.forEach(r=>out.push('⚠️ '+h.name+': '+r));
-      }
-    });
-    return [...new Set(out)];
-  };
-  window.kovanSmartReport=function(){
-    const active=(db.hives||[]).filter(h=>h.status!=='Pasif');
-    const scored=active.map(h=>({h,g:colonyScore(h)})).filter(x=>x.g.score!=null);
-    const avg=scored.length?Math.round(scored.reduce((a,x)=>a+x.g.score,0)/scored.length):null;
-    return {active:active.length,average:avg,attention:scored.filter(x=>x.g.score<45).length,ranking:scored.sort((a,b)=>b.g.score-a.g.score)};
-  };
+  function latestInspection(hiveId){return (db.inspections||[]).filter(x=>x.hive===hiveId).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0]||null}
+  function colonyScore(hive){const i=latestInspection(hive.id);if(!i)return{score:null,label:'Kontrol gerekli',reasons:['Henüz kontrol kaydı yok']};let s=50,reasons=[];const bee=i.beeFrames===''||i.beeFrames==null?null:+i.beeFrames,brood=i.broodFrames===''||i.broodFrames==null?null:+i.broodFrames,honey=i.honeyFrames===''||i.honeyFrames==null?null:+i.honeyFrames,varroa=i.varroaCount===''||i.varroaCount==null?null:+i.varroaCount;if(bee!=null){s+=Math.min(20,bee*2);if(bee<=4)reasons.push('Arılı çerçeve düşük')}if(brood!=null){s+=Math.min(15,brood*2.5);if(brood<=2)reasons.push('Yavrulu çerçeve düşük')}s+=({İyi:10,Orta:5,Zayıf:-5,Yok:-15}[i.brood]||0);s+=({'Görüldü':5,'Yumurta görüldü':5,'Görülmedi':-5,'Şüpheli':-10}[i.queen]||0);s+=({İyi:5,Orta:2,Az:-4,Yok:-10}[i.food]||0);if(i.food==='Az'||i.food==='Yok')reasons.push('Yem/bal stoku '+i.food.toLowerCase());if(i.queen==='Görülmedi'||i.queen==='Şüpheli')reasons.push('Ana arı kontrolü gerekli');if(i.swarm&&i.swarm!=='Yok'){s-=8;reasons.push('Oğul eğilimi: '+i.swarm)}if(varroa!=null&&varroa>0){s-=Math.min(15,varroa);reasons.push('Varroa sayımı: '+varroa)}if(hive.status==='Zayıf')s-=10;if(hive.status==='Ana arısız'){s-=25;reasons.push('Ana arısız')}s=Math.max(0,Math.min(100,Math.round(s)));return{score:s,label:s>=80?'Çok iyi':s>=65?'İyi':s>=45?'Orta':'Dikkat',reasons,bee,brood,honey,varroa}}
+  window.latestInspection=latestInspection;window.colonyScore=colonyScore;window.kovanSmartAlerts=function(){const out=[];(db.hives||[]).filter(h=>h.status!=='Pasif').forEach(h=>{const g=colonyScore(h);if(g.score==null)out.push('⚠️ '+h.name+': kontrol kaydı gerekli');else{if(g.score<45)out.push('📉 '+h.name+': güç puanı '+g.score+'/100');g.reasons.forEach(r=>out.push('⚠️ '+h.name+': '+r))}});return[...new Set(out)]};window.kovanSmartReport=function(){const active=(db.hives||[]).filter(h=>h.status!=='Pasif'),scored=active.map(h=>({h,g:colonyScore(h)})).filter(x=>x.g.score!=null),avg=scored.length?Math.round(scored.reduce((a,x)=>a+x.g.score,0)/scored.length):null;return{active:active.length,average:avg,attention:scored.filter(x=>x.g.score<45).length,ranking:scored.sort((a,b)=>b.g.score-a.g.score)}};
+  const LAT=39.8279,LON=28.0253,WMO={0:'Açık',1:'Çoğunlukla açık',2:'Parçalı bulutlu',3:'Bulutlu',45:'Sisli',48:'Sisli',51:'Hafif çisenti',53:'Çisenti',55:'Yoğun çisenti',61:'Hafif yağmur',63:'Yağmur',65:'Kuvvetli yağmur',71:'Hafif kar',73:'Kar',75:'Yoğun kar',80:'Hafif sağanak',81:'Sağanak',82:'Kuvvetli sağanak',95:'Gök gürültülü'};
+  const df=d=>new Date(d+'T12:00:00').toLocaleDateString('tr-TR',{weekday:'short',day:'numeric',month:'short'});
+  function beeAdvice(x){let a=[];if(x.rain>=5||x.pop>=70)a.push('🌧️ Kovanı açma; dışarıdan uçuş ve giriş kontrolü yap.');else if(x.wind>=30)a.push('💨 Rüzgâr kuvvetli; uzun kontrol yapma, kapakları ve sabitlemeyi kontrol et.');else if(x.max<14)a.push('🥶 Serin; kovanı açmadan dış gözlem yap.');else a.push('🔎 Kontrol uygun: yavru, ana arı belirtisi ve yem stokuna bak.');if(x.min<=8)a.push('🌡️ Gece soğuyor; zayıf koloniler ve yem stoğu öncelikli.');if(x.max>=30)a.push('☀️ Sıcak; su kaynağını kontrol et, öğle sıcağında kovan açma.');if(x.rain<1&&x.max>=18&&x.wind<25)a.push('🐝 Uçuş şartları iyi; nektar/polen girişini gözlemle.');if(x.pop<30&&x.wind<20&&x.max>=16&&x.max<=28)a.push('👑 Ana arı ve yavru kontrolü için ılık-sakin saatler uygun.');return a}
+  async function loadWeather(){let home=document.getElementById('home');if(!home)return;let sec=document.getElementById('apiaryWeather');if(!sec){sec=document.createElement('section');sec.id='apiaryWeather';sec.className='card section';sec.innerHTML='<div class="row"><h2>🌤️ Gökçedere hava & arıcılık takvimi</h2><button class="small" id="weatherRefresh">Yenile</button></div><div id="weatherBody"><p class="muted">Hava durumu yükleniyor…</p></div>';home.appendChild(sec);document.getElementById('weatherRefresh').onclick=loadWeather}let box=document.getElementById('weatherBody');try{let r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=Europe%2FIstanbul&forecast_days=10`);if(!r.ok)throw 0;let j=await r.json(),d=j.daily,days=d.time.map((date,i)=>({date,max:d.temperature_2m_max[i],min:d.temperature_2m_min[i],rain:d.precipitation_sum[i]||0,pop:d.precipitation_probability_max[i]||0,wind:d.wind_speed_10m_max[i]||0,code:d.weather_code[i]})),best=days.filter(x=>x.max>=16&&x.max<=28&&x.rain<1&&x.pop<40&&x.wind<25).slice(0,3);box.innerHTML='<div style="display:grid;gap:9px">'+days.map((x,i)=>`<div class="hive" style="cursor:default"><div class="row"><div><b>${i===0?'Bugün · ':''}${df(x.date)}</b><div class="muted">${WMO[x.code]||'Değişken'} · Yağış %${Math.round(x.pop)} · Rüzgâr ${Math.round(x.wind)} km/s</div></div><b style="font-size:20px">${Math.round(x.max)}° / ${Math.round(x.min)}°</b></div><div style="margin-top:8px">${beeAdvice(x).map(a=>`<div class="muted" style="margin:4px 0">${a}</div>`).join('')}</div></div>`).join('')+'</div>'+`<div class="alertbox section"><b>📅 En uygun yaklaşan kontrol günleri</b><div class="muted" style="margin-top:5px">${best.length?best.map(x=>df(x.date)).join(' · '):'Şimdilik belirgin uygun gün görünmüyor; tahmin değiştikçe tekrar kontrol et.'}</div></div><p class="muted">10 günlük plan Gökçedere/Susurluk tahminine göre otomatik yenilenir. Öneri; yağış, sıcaklık ve rüzgârı dikkate alır.</p>`}catch(e){box.innerHTML='<div class="alertbox"><b>Hava verisi alınamadı.</b><div class="muted">İnternet bağlantısı geldiğinde Yenile’ye bas.</div></div>'}}
+  window.KovanWeather={load:loadWeather};window.addEventListener('load',loadWeather);
 })();
